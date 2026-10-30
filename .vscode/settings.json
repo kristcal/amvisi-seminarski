@@ -1,0 +1,14 @@
+{
+  "calva.replConnectSequences": [
+    {
+      "name": "Leiningen (Windows fix)",
+      "projectType": "custom",
+      "projectRootPath": ["."],
+      "customJackInCommandLine": "lein repl :headless",
+      "nReplPortFile": [".nrepl-port"],
+      "autoSelectForJackIn": true,
+      "autoSelectForConnect": true,
+      "cljsType": "none"
+    }
+  ]
+}

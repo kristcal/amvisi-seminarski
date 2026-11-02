@@ -1,40 +1,67 @@
 (ns amvisi-seminarski.core
-  (:require [clojure.string :as str])
-  (:gen-class))
+  (:require [clojure.string :as str]))
 
-(def transakcije
-  [{:opis "IP nalog: KIRIJA MARKO MARKOVIC" :odliv 20000}
-   {:opis "MAXI PRODAVNICA" :odliv 3450}
-   {:opis "BUS PLUS DOPUNA" :odliv 1500}
-   {:opis "IDEA MARKET" :odliv 2100}
-   {:opis "IP nalog: STEDNJA JA UNICREDIT" :odliv 10000}])
+(def recepti
+  [{:naziv "Palacinke"
+    :sastojci ["brasno" "mleko" "jaja"]
+    :vreme 20}
 
-(def pravila
-  {:prenos ["ja unicredit"]
-   :racuni ["kirija" "struja"]
-   :hrana  ["maxi" "idea"]
-   :prevoz ["bus plus"]})
+   {:naziv "Testenina"
+    :sastojci ["testenina" "paradajz" "sir"]
+    :vreme 30}])
 
-(defn kategorija [t]
-  (let [opis (str/lower-case (:opis t))]
-    (or (some (fn [[naziv reci]]
-                (when (some #(str/includes? opis %) reci) naziv))
-              pravila)
-        :ostalo)))
 
-(defn trosak? [t]
-  (not= :prenos (kategorija t)))
+(defn dodaj-recept [recepti]
+  (println "Unesi naziv recepta:")
+  (let [naziv (read-line)]
 
-(defn potrosnja-po-kategoriji [transakcije]
-  (reduce (fn [rezultat t]
-            (update rezultat (kategorija t) (fnil + 0) (:odliv t)))
-          {}
-          (filter trosak? transakcije)))
+    (println "Unesi sastojke, odvojene zarezom:")
+    (let [sastojci (read-line)]
 
-;; Sledece faze (pseudokod):
-;; - ucitaj pravi izvod iz PDF/CSV fajla
-;; - umesto pravila, nauci kategorije naivnim Bajesovim klasifikatorom
-;; - pronadji neobicno velike troskove i predvidi potrosnju
+      (println "Unesi vreme pripreme u minutima:")
+      (let [vreme (read-line)]
+
+        (conj recepti
+              {:naziv naziv
+               :sastojci (str/split sastojci #", ")
+               :vreme (Integer/parseInt vreme)})))))
+
+
+(defn prikazi-recepte [recepti]
+  (println "\n--- MOJI RECEPTI ---")
+
+  (doseq [recept recepti]
+    (println "\nNaziv:" (:naziv recept))
+    (println "Sastojci:" (:sastojci recept))
+    (println "Vreme pripreme:" (:vreme recept) "minuta")))
+
+
+(defn meni []
+  (loop [recepti recepti]
+
+    (println "\n1. Dodaj recept")
+    (println "2. Prikazi recepte")
+    (println "3. Izlaz")
+
+    (let [izbor (read-line)]
+
+      (cond
+        (= izbor "1")
+        (recur (dodaj-recept recepti))
+
+        (= izbor "2")
+        (do
+          (prikazi-recepte recepti)
+          (recur recepti))
+
+        (= izbor "3")
+        (println "Dovidjenja!")
+
+        :else
+        (do
+          (println "Nepostojeca opcija.")
+          (recur recepti))))))
+
 
 (defn -main [& args]
-  (println "Potrosnja po kategorijama:" (potrosnja-po-kategoriji transakcije)))
+  (meni))

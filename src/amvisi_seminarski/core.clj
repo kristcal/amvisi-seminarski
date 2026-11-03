@@ -10,6 +10,10 @@
     :sastojci ["testenina" "paradajz" "sir"]
     :vreme 30}])
 
+(defn napravi-recept [naziv sastojci vreme]
+  {:naziv naziv
+   :sastojci sastojci
+   :vreme vreme})
 
 (defn dodaj-recept [recepti]
   (println "Unesi naziv recepta:")
@@ -22,9 +26,9 @@
       (let [vreme (read-line)]
 
         (conj recepti
-              {:naziv naziv
-               :sastojci (str/split sastojci #", ")
-               :vreme (Integer/parseInt vreme)})))))
+              (napravi-recept naziv
+                              (str/split sastojci #", ")
+                              (Integer/parseInt vreme)))))))
 
 
 (defn prikazi-recepte [recepti]
@@ -35,6 +39,10 @@
     (println "Sastojci:" (:sastojci recept))
     (println "Vreme pripreme:" (:vreme recept) "minuta")))
 
+(defn napravi-recept [naziv sastojci vreme]
+  {:naziv naziv
+   :sastojci sastojci
+   :vreme vreme})
 
 (defn meni []
   (loop [recepti recepti]

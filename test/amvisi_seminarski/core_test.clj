@@ -66,3 +66,48 @@
           (count (core/dodaj-recept core/recepti))))
       =>
       2)
+
+(fact "Pretraga po nazivu vraca samo recepte sa tim nazivom"
+      (map :naziv (core/pretrazi-po-nazivu core/recepti "test"))
+      =>
+      ["Testenina"])
+
+(fact "Pretraga po nazivu ne trazi u sastojcima"
+      (core/pretrazi-po-nazivu core/recepti "mleko")
+      =>
+      empty?)
+
+(fact "Pretraga po sastojku vraca recept sa tim sastojkom"
+      (map :naziv (core/pretrazi-po-sastojku core/recepti "paradajz"))
+      =>
+      ["Testenina"])
+
+(fact "Pretraga po sastojku ne trazi u nazivu"
+      (core/pretrazi-po-sastojku core/recepti "palacinke")
+      =>
+      empty?)
+
+(fact "Prazan pojam ne vraca nista"
+      (core/pretrazi-po-nazivu core/recepti "   ")
+      =>
+      empty?
+
+      (core/pretrazi-po-sastojku core/recepti "")
+      =>
+      empty?)
+
+(fact "Pojam sa razmacima se normalizuje"
+      (map :naziv (core/pretrazi-po-nazivu core/recepti "  PALACINKE  "))
+      =>
+      ["Palacinke"])
+
+(fact "Prazni sastojci se uklanjaju pri dodavanju"
+      (with-in-str "Omlet\n jaja , ,sir\n10\n"
+        (binding [*out* (java.io.StringWriter.)]
+          (:sastojci (last (core/dodaj-recept core/recepti)))))
+      =>
+      ["jaja" "sir"])
+
+(fact "Prikaz broja recepata"
+      (with-out-str (core/prikazi-broj-recepata core/recepti))
+      => #"Ukupan broj recepata: 2")
